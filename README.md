@@ -27,3 +27,7 @@ In practice, this means using NeDB backed with LowDB by default, and using Mongo
   - Removes ObjectID's in create post-haste
   - JSONifies all queries
 - [ ] Make an index/key API that is DB agnostic
+
+# Contributing
+
+- [CodeFlow](https://stackblitz.com/~/github.com/FossPrime/feathers-nosql)
