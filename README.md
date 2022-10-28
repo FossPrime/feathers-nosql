@@ -18,3 +18,12 @@ Instead, this adapter will
 
 
 In practice, this means using NeDB backed with LowDB by default, and using MongoDB when NODE_ENV is 'production'. The API is like MongoDB 1.4.
+
+# To-do for v1
+
+- [ ] Create the LowDB@v3 dev DB
+- [ ] Support MongoDB connections
+- [ ] Send EJSON to the guillotine
+  - Removes ObjectID's in create post-haste
+  - JSONifies all queries
+- [ ] Make an index/key API that is DB agnostic
