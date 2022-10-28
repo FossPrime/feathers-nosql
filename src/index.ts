@@ -1,16 +1,33 @@
 import errors from '@feathersjs/errors'
-import {_} from '@feathersjs/commons'
-import {sorter, select, AdapterService} from '@feathersjs/adapter-commons'
+import { _ } from '@feathersjs/commons'
+import { sorter, select, AdapterService } from '@feathersjs/adapter-commons'
 import sift from 'sift'
 
-const _select = (data, ...args) => {
-  const base = select(...args)
+import type { ServiceOptions } from '@feathersjs/adapter-commons'
+
+const _select = (data: any, params: any, ...args: any) => {
+  const base = select(params, ...args)
 
   return base(JSON.parse(JSON.stringify(data)))
 }
 
+export interface MemoryServiceStore {
+  [key: number]: any
+}
+
+interface MemoryServiceOptions extends ServiceOptions {
+  store: MemoryServiceStore
+  startId: number
+  matcher: (query: any) => any
+  sorter: (sort: any) => any
+}
+
 export class Service extends AdapterService {
-  constructor(options = {}) {
+  _uId: any
+  store: any
+  options: MemoryServiceOptions
+  // Todo: types
+  constructor(options?: Partial<MemoryServiceOptions>) {
     super(
       _.extend(
         {
@@ -21,12 +38,12 @@ export class Service extends AdapterService {
         options
       )
     )
-    this._uId = options.startId || 0
-    this.store = options.store || {}
+    this._uId = options?.startId || 0
+    this.store = options?.store || {}
   }
 
   async getEntries(params = {}) {
-    const {query} = this.filterQuery(params)
+    const { query } = this.filterQuery(params)
 
     return this._find(
       Object.assign({}, params, {
@@ -37,7 +54,7 @@ export class Service extends AdapterService {
   }
 
   async _find(params = {}) {
-    const {query, filters, paginate} = this.filterQuery(params)
+    const { query, filters, paginate } = this.filterQuery(params)
     let values = _.values(this.store).filter(this.options.matcher(query))
     const total = values.length
 
@@ -60,7 +77,8 @@ export class Service extends AdapterService {
       data: values.map(value => _select(value, params))
     }
 
-    if (!(paginate && paginate.default)) {
+    // Todo: types
+    if (!(paginate && (paginate as any).default)) {
       return result.data
     }
 
@@ -69,7 +87,7 @@ export class Service extends AdapterService {
 
   async _get(id, params = {}) {
     if (id in this.store) {
-      const {query} = this.filterQuery(params)
+      const { query } = this.filterQuery(params)
       const value = this.store[id]
 
       if (this.options.matcher(query)(value)) {
@@ -87,7 +105,7 @@ export class Service extends AdapterService {
     }
 
     const id = data[this.id] || this._uId++
-    const current = _.extend({}, data, {[this.id]: id})
+    const current = _.extend({}, data, { [this.id]: id })
     const result = (this.store[id] = current)
 
     return _select(result, params, this.id)
@@ -100,7 +118,7 @@ export class Service extends AdapterService {
 
     id = oldId == id ? oldId : id // eslint-disable-line
 
-    this.store[id] = _.extend({}, data, {[this.id]: id})
+    this.store[id] = _.extend({}, data, { [this.id]: id })
 
     return this._get(id, params)
   }
@@ -115,7 +133,7 @@ export class Service extends AdapterService {
     }
 
     if (id === null) {
-      const entries = await this.getEntries(params)
+      const entries = await this.getEntries(params) as any[]
 
       return entries.map(patchEntry)
     }
@@ -126,7 +144,7 @@ export class Service extends AdapterService {
   // Remove without hooks and mixins that can be used internally
   async _remove(id, params = {}) {
     if (id === null) {
-      const entries = await this.getEntries(params)
+      const entries = await this.getEntries(params) as any[]
 
       return Promise.all(entries.map(current => this._remove(current[this.id], params)))
     }
@@ -140,6 +158,6 @@ export class Service extends AdapterService {
 }
 
 // TODO: Default exports are problematic... check if we can remove this
-export default options => {
+export default (options?: Partial<MemoryServiceOptions>) => {
   return new Service(options)
 }
