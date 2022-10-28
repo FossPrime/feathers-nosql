@@ -1,0 +1,19 @@
+{
+name: "feathers-nosql",
+version: "0.0.0",
+description: "A NoSQL database adapter for feathers, batteries included.",
+main: "index.js",
+scripts: {
+test: "echo "Error: no test specified" && exit 1"
+},
+keywords: [
+"pwa",
+"feathers",
+"nosql",
+"mongodb",
+"nedb",
+"lowdb"
+],
+author: "Ray Foss",
+license: "MIT"
+}
