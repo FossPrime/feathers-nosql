@@ -6,4 +6,5 @@
   "typescript.format.semicolons": "remove",
   "typescript.preferences.quoteStyle": "single",
   "javascript.preferences.quoteStyle": "single"
+  // Prettier config in package.json
 }
