@@ -1,9 +1,13 @@
 {
   "name": "feathers-nosql",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A NoSQL database adapter for feathers, batteries included.",
   "type": "module",
-  "main": "dist/index.js",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "scripts": {
     "test": "npx pnpx tsx test/index.test.ts",
     "build": "tsup"
@@ -30,7 +34,8 @@
     "@types/node": "18",
     "node-test": "^1.4.6",
     "tsup": "^6.3.0",
-    "tsx": "^3.11.0"
+    "tsx": "^3.11.0",
+    "typescript": "^4.8.4"
   },
   "engines": {
     "node": ">=16",

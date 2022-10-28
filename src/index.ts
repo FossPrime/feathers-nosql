@@ -25,7 +25,7 @@ interface MemoryServiceOptions extends ServiceOptions {
 export class Service extends AdapterService {
   _uId: any
   store: any
-  options: MemoryServiceOptions
+  declare options: MemoryServiceOptions
   // Todo: types
   constructor(options?: Partial<MemoryServiceOptions>) {
     super(
@@ -85,7 +85,7 @@ export class Service extends AdapterService {
     return result
   }
 
-  async _get(id, params = {}) {
+  async _get(id: any, params = {}) {
     if (id in this.store) {
       const { query } = this.filterQuery(params)
       const value = this.store[id]
@@ -99,7 +99,7 @@ export class Service extends AdapterService {
   }
 
   // Create without hooks and mixins that can be used internally
-  async _create(data, params = {}) {
+  async _create(data: any, params = {}): Promise<any> {
     if (Array.isArray(data)) {
       return Promise.all(data.map(current => this._create(current, params)))
     }
@@ -111,7 +111,7 @@ export class Service extends AdapterService {
     return _select(result, params, this.id)
   }
 
-  async _update(id, data, params = {}) {
+  async _update(id: any, data: any, params = {}) {
     const oldEntry = await this._get(id)
     // We don't want our id to change type if it can be coerced
     const oldId = oldEntry[this.id]
@@ -123,8 +123,8 @@ export class Service extends AdapterService {
     return this._get(id, params)
   }
 
-  async _patch(id, data, params = {}) {
-    const patchEntry = entry => {
+  async _patch(id: any, data: any, params = {}) {
+    const patchEntry = (entry: any) => {
       const currentId = entry[this.id]
 
       this.store[currentId] = _.extend(this.store[currentId], _.omit(data, this.id))
@@ -142,7 +142,7 @@ export class Service extends AdapterService {
   }
 
   // Remove without hooks and mixins that can be used internally
-  async _remove(id, params = {}) {
+  async _remove(id: any, params = {}): Promise<any> {
     if (id === null) {
       const entries = await this.getEntries(params) as any[]
 
