@@ -26,5 +26,5 @@
     "tsx": "^3.11.0",
     "vite": "^3.2.1"
   },
-  "prettier": "vite"
+  "prettier": "@github/prettier-config"
 }

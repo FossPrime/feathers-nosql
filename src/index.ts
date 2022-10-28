@@ -3,7 +3,7 @@ import { _ } from '@feathersjs/commons'
 import { sorter, select, AdapterService } from '@feathersjs/adapter-commons';
 import sift from 'sift' 
  
-const _select = (data, ...args) => {
+const _select = (data, ...args) => { 
   const base = select(...args);
 
   return base(JSON.parse(JSON.stringify(data)));
