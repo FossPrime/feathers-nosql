@@ -1,0 +1,81 @@
+lockfileVersion: 5.4
+
+specifiers:
+  '@feathersjs/adapter-commons': ^4.4.3
+  '@feathersjs/commons': ^4.4.3
+  '@feathersjs/errors': ^4.4.3
+  sift: ^11.0.10
+
+dependencies:
+  '@feathersjs/adapter-commons': 4.5.15
+  '@feathersjs/commons': 4.5.15
+  '@feathersjs/errors': 4.5.15
+  sift: 11.1.8
+
+packages:
+
+  /@feathersjs/adapter-commons/4.5.15:
+    resolution: {integrity: sha512-kKqL4mYCe+dBn271lfJb6/79qEL0C7R7EfVrW+U75uCGrOuE3Ws8LbE2SQcjasUcrzZQShiJDJIpU/grcTPsHg==}
+    engines: {node: '>= 10'}
+    dependencies:
+      '@feathersjs/commons': 4.5.15
+      '@feathersjs/errors': 4.5.15
+      '@feathersjs/feathers': 4.5.15
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /@feathersjs/commons/4.5.15:
+    resolution: {integrity: sha512-eVEcLJL3GcPQBQcD77jI3fZ4MMx+iD02Px2Z1lDw+cn/iGCeQkWWAPQs4Tp+HGR1rTL5JO+unyhzN8V9X7OYmw==}
+    engines: {node: '>= 10'}
+    dev: false
+
+  /@feathersjs/errors/4.5.15:
+    resolution: {integrity: sha512-EJAYWMsWZlUA/halbgZBc6eP2d3HPkHi5GzprYEK58GCh51KJ36VjX7VKVEnMjgBSED+PE00tpr3ZvUC4nUR+Q==}
+    engines: {node: '>= 10'}
+    dependencies:
+      debug: 4.3.4
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /@feathersjs/feathers/4.5.15:
+    resolution: {integrity: sha512-Q7sa1QAEhspYHsVEJPRg313bqjNaOhgvibiUxtjf3CGGJL9hVcAPLHQbrzsZuVTR4QwBATZSf6voEtuNmG/pIQ==}
+    engines: {node: '>= 10'}
+    dependencies:
+      '@feathersjs/commons': 4.5.15
+      debug: 4.3.4
+      events: 3.3.0
+      uberproto: 2.0.6
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /debug/4.3.4:
+    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
+    engines: {node: '>=6.0'}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+    dependencies:
+      ms: 2.1.2
+    dev: false
+
+  /events/3.3.0:
+    resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
+    engines: {node: '>=0.8.x'}
+    dev: false
+
+  /ms/2.1.2:
+    resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
+    dev: false
+
+  /sift/11.1.8:
+    resolution: {integrity: sha512-QoNDdWFzFrtoNdYeJeDjhceLiuHOGlLacVxE7Y5QX/teBeYBWRM6s4RatraBoRvEsoDr/bsjeCmEH0hSHCJChQ==}
+    dev: false
+
+  /uberproto/2.0.6:
+    resolution: {integrity: sha512-68H97HffZoFaa3HFtpstahWorN9dSp5uTU6jo3GjIQ6JkJBR3hC2Nx/e/HFOoYHdUyT/Z1MRWfxN1EiQJZUyCQ==}
+    dev: false
