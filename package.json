@@ -5,7 +5,8 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "test": "npx pnpx tsx test/index.test.ts"
+    "test": "npx pnpx tsx test/index.test.ts",
+    "build": "tsup"
   },
   "keywords": [
     "pwa",
@@ -28,12 +29,24 @@
     "@feathersjs/feathers": "^4.5.15",
     "@types/node": "18",
     "node-test": "^1.4.6",
-    "tsx": "^3.11.0",
-    "vite": "^3.2.1"
+    "tsup": "^6.3.0",
+    "tsx": "^3.11.0"
   },
   "engines": {
     "node": ">=16",
     "pnpm": ">=7"
   },
-  "prettier": "@github/prettier-config"
+  "prettier": "@github/prettier-config",
+  "tsup": {
+    "entry": [
+      "src/index.ts"
+    ],
+    "format": [
+      "esm",
+      "cjs"
+    ],
+    "sourcemap": true,
+    "clean": true,
+    "dts": true
+  }
 }
