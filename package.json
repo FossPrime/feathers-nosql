@@ -1,19 +1,26 @@
 {
-name: "feathers-nosql",
-version: "0.0.0",
-description: "A NoSQL database adapter for feathers, batteries included.",
-main: "index.js",
-scripts: {
-test: "echo "Error: no test specified" && exit 1"
-},
-keywords: [
-"pwa",
-"feathers",
-"nosql",
-"mongodb",
-"nedb",
-"lowdb"
-],
-author: "Ray Foss",
-license: "MIT"
+  "name": "feathers-nosql",
+  "version": "0.0.0",
+   "description": "A NoSQL database adapter for feathers, batteries included.",
+   "main": "index.js",
+   "scripts": {
+     "test": "echo 'Error: no test specified' && exit 1"
+   },
+   "keywords": [
+    "pwa",
+    "feathers",
+    "nosql",
+    "mongodb",
+    "nedb",
+    "lowdb"
+  ],
+  "author": "Ray Foss",
+  "license": "MIT",
+  "dependencies": {
+    "@feathersjs/adapter-commons": "^4.4.3",
+    "@feathersjs/commons": "^4.4.3",
+    "@feathersjs/errors": "^4.4.3",
+    "sift": "^11.0.10"
+  }
 }
+
