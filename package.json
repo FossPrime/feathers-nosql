@@ -1,6 +1,6 @@
 {
   "name": "feathers-nosql",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A NoSQL database adapter for feathers, batteries included.",
   "type": "module",
   "exports": {
@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "npx pnpx tsx test/index.test.ts",
-    "build": "tsup"
+    "build": "npx tsup"
   },
   "keywords": [
     "pwa",
