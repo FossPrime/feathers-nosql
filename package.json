@@ -9,7 +9,7 @@
     "require": "./dist/index.cjs"
   },
   "scripts": {
-    "test": "npx pnpx tsx test/index.test.ts",
+    "test": "pnpx tsx test/index.test.ts",
     "build": "npx tsup"
   },
   "keywords": [
@@ -23,14 +23,14 @@
   "author": "Ray Foss",
   "license": "MIT",
   "dependencies": {
-    "@feathersjs/adapter-commons": "^4.4.3",
-    "@feathersjs/commons": "^4.4.3",
-    "@feathersjs/errors": "^4.4.3",
-    "sift": "^11.0.10"
+    "@feathersjs/adapter-commons": "^5.0.0-pre.32",
+    "@feathersjs/commons": "^5.0.0-pre.32",
+    "@feathersjs/errors": "^5.0.0-pre.32",
+    "sift": "^16.0.0"
   },
   "devDependencies": {
-    "@feathersjs/adapter-tests": "^4.5.15",
-    "@feathersjs/feathers": "^4.5.15",
+    "@feathersjs/adapter-tests": "^5.0.0-pre.32",
+    "@feathersjs/feathers": "^5.0.0-pre.32",
     "@types/node": "18",
     "node-test": "^1.4.6",
     "tsup": "^6.3.0",

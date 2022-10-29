@@ -1,0 +1,7 @@
+{
+  "pnpm": {
+    "overrides": {
+      "@feathersjs/adapter-tests": "./packages/adapter-commons"
+    }
+  }
+}

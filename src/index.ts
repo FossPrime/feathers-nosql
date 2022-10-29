@@ -1,60 +1,80 @@
-import errors from '@feathersjs/errors'
+import { NotFound } from '@feathersjs/errors'
 import { _ } from '@feathersjs/commons'
-import { sorter, select, AdapterService } from '@feathersjs/adapter-commons'
+import {
+  sorter,
+  select,
+  AdapterBase,
+  AdapterServiceOptions,
+  PaginationOptions,
+  AdapterParams
+} from '@feathersjs/adapter-commons'
 import sift from 'sift'
+import { NullableId, Id, Params, ServiceMethods, Paginated } from '@feathersjs/feathers'
 
-import type { ServiceOptions } from '@feathersjs/adapter-commons'
+export interface MemoryServiceStore<T> {
+  [key: string]: T
+}
 
-const _select = (data: any, params: any, ...args: any) => {
+export interface MemoryServiceOptions<T = any> extends AdapterServiceOptions {
+  store?: MemoryServiceStore<T>
+  startId?: number
+  matcher?: (query: any) => any
+  sorter?: (sort: any) => any
+}
+
+const _select = (data: any, params: any, ...args: any[]) => {
   const base = select(params, ...args)
 
   return base(JSON.parse(JSON.stringify(data)))
 }
 
-export interface MemoryServiceStore {
-  [key: number]: any
-}
+export class MemoryAdapter<T = any, D = Partial<T>, P extends Params = Params> extends AdapterBase<
+  T,
+  D,
+  P,
+  MemoryServiceOptions<T>
+> {
+  store: MemoryServiceStore<T>
+  _uId: number
 
-interface MemoryServiceOptions extends ServiceOptions {
-  store: MemoryServiceStore
-  startId: number
-  matcher: (query: any) => any
-  sorter: (sort: any) => any
-}
-
-export class Service extends AdapterService {
-  _uId: any
-  store: any
-  declare options: MemoryServiceOptions
-  // Todo: types
-  constructor(options?: Partial<MemoryServiceOptions>) {
-    super(
-      _.extend(
-        {
-          id: 'id',
-          matcher: sift,
-          sorter
-        },
-        options
-      )
-    )
-    this._uId = options?.startId || 0
-    this.store = options?.store || {}
+  constructor(options: MemoryServiceOptions<T> = {}) {
+    super({
+      id: 'id',
+      matcher: sift,
+      sorter,
+      store: {},
+      startId: 0,
+      ...options
+    })
+    this._uId = this.options.startId
+    this.store = { ...this.options.store }
   }
 
-  async getEntries(params = {}) {
-    const { query } = this.filterQuery(params)
+  async getEntries(_params?: P) {
+    const params = _params || ({} as P)
 
-    return this._find(
-      Object.assign({}, params, {
-        paginate: false,
-        query
-      })
-    )
+    return this.$find({
+      ...params,
+      paginate: false
+    })
   }
 
-  async _find(params = {}) {
-    const { query, filters, paginate } = this.filterQuery(params)
+  getQuery(params: P) {
+    const { $skip, $sort, $limit, $select, ...query } = params.query || {}
+
+    return {
+      query,
+      filters: { $skip, $sort, $limit, $select }
+    }
+  }
+
+  async $find(_params?: P & { paginate?: PaginationOptions }): Promise<Paginated<T>>
+  async $find(_params?: P & { paginate: false }): Promise<T[]>
+  async $find(_params?: P): Promise<Paginated<T> | T[]>
+  async $find(params: P = {} as P): Promise<Paginated<T> | T[]> {
+    const { paginate } = this.getOptions(params)
+    const { query, filters } = this.getQuery(params)
+
     let values = _.values(this.store).filter(this.options.matcher(query))
     const total = values.length
 
@@ -70,24 +90,24 @@ export class Service extends AdapterService {
       values = values.slice(0, filters.$limit)
     }
 
-    const result = {
+    const result: Paginated<T> = {
       total,
       limit: filters.$limit,
       skip: filters.$skip || 0,
-      data: values.map(value => _select(value, params))
+      data: values.map((value) => _select(value, params))
     }
 
-    // Todo: types
-    if (!(paginate && (paginate as any).default)) {
+    if (!paginate) {
       return result.data
     }
 
     return result
   }
 
-  async _get(id: any, params = {}) {
+  async $get(id: Id, params: P = {} as P): Promise<T> {
+    const { query } = this.getQuery(params)
+
     if (id in this.store) {
-      const { query } = this.filterQuery(params)
       const value = this.store[id]
 
       if (this.options.matcher(query)(value)) {
@@ -95,37 +115,44 @@ export class Service extends AdapterService {
       }
     }
 
-    throw new errors.NotFound(`No record found for id '${id}'`)
+    throw new NotFound(`No record found for id '${id}'`)
   }
 
-  // Create without hooks and mixins that can be used internally
-  async _create(data: any, params = {}): Promise<any> {
+  async $create(data: Partial<D>, params?: P): Promise<T>
+  async $create(data: Partial<D>[], params?: P): Promise<T[]>
+  async $create(data: Partial<D> | Partial<D>[], _params?: P): Promise<T | T[]>
+  async $create(data: Partial<D> | Partial<D>[], params: P = {} as P): Promise<T | T[]> {
     if (Array.isArray(data)) {
-      return Promise.all(data.map(current => this._create(current, params)))
+      return Promise.all(data.map((current) => this.$create(current, params)))
     }
 
-    const id = data[this.id] || this._uId++
+    const id = (data as any)[this.id] || this._uId++
     const current = _.extend({}, data, { [this.id]: id })
     const result = (this.store[id] = current)
 
-    return _select(result, params, this.id)
+    return _select(result, params, this.id) as T
   }
 
-  async _update(id: any, data: any, params = {}) {
-    const oldEntry = await this._get(id)
+  async $update(id: Id, data: D, params: P = {} as P): Promise<T> {
+    const oldEntry = await this.$get(id)
     // We don't want our id to change type if it can be coerced
-    const oldId = oldEntry[this.id]
+    const oldId = (oldEntry as any)[this.id]
 
-    id = oldId == id ? oldId : id // eslint-disable-line
+    // eslint-disable-next-line eqeqeq
+    id = oldId == id ? oldId : id
 
     this.store[id] = _.extend({}, data, { [this.id]: id })
 
-    return this._get(id, params)
+    return this.$get(id, params)
   }
 
-  async _patch(id: any, data: any, params = {}) {
-    const patchEntry = (entry: any) => {
-      const currentId = entry[this.id]
+  async $patch(id: null, data: Partial<D>, params?: P): Promise<T[]>
+  async $patch(id: Id, data: Partial<D>, params?: P): Promise<T>
+  async $patch(id: NullableId, data: Partial<D>, _params?: P): Promise<T | T[]>
+  async $patch(id: NullableId, data: Partial<D>, params: P = {} as P): Promise<T | T[]> {
+    const { query } = this.getQuery(params)
+    const patchEntry = (entry: T) => {
+      const currentId = (entry as any)[this.id]
 
       this.store[currentId] = _.extend(this.store[currentId], _.omit(data, this.id))
 
@@ -133,23 +160,33 @@ export class Service extends AdapterService {
     }
 
     if (id === null) {
-      const entries = await this.getEntries(params) as any[]
+      const entries = await this.getEntries({
+        ...params,
+        query
+      })
 
       return entries.map(patchEntry)
     }
 
-    return patchEntry(await this._get(id, params)) // Will throw an error if not found
+    return patchEntry(await this.$get(id, params)) // Will throw an error if not found
   }
 
-  // Remove without hooks and mixins that can be used internally
-  async _remove(id: any, params = {}): Promise<any> {
-    if (id === null) {
-      const entries = await this.getEntries(params) as any[]
+  async $remove(id: null, params?: P): Promise<T[]>
+  async $remove(id: Id, params?: P): Promise<T>
+  async $remove(id: NullableId, _params?: P): Promise<T | T[]>
+  async $remove(id: NullableId, params: P = {} as P): Promise<T | T[]> {
+    const { query } = this.getQuery(params)
 
-      return Promise.all(entries.map(current => this._remove(current[this.id], params)))
+    if (id === null) {
+      const entries = await this.getEntries({
+        ...params,
+        query
+      })
+
+      return Promise.all(entries.map((current: any) => this.$remove(current[this.id] as Id, params)))
     }
 
-    const entry = await this._get(id, params)
+    const entry = await this.$get(id, params)
 
     delete this.store[id]
 
@@ -157,7 +194,46 @@ export class Service extends AdapterService {
   }
 }
 
-// TODO: Default exports are problematic... check if we can remove this
-export default (options?: Partial<MemoryServiceOptions>) => {
-  return new Service(options)
+export class MemoryService<T = any, D = Partial<T>, P extends AdapterParams = AdapterParams>
+  extends MemoryAdapter<T, D, P>
+  implements ServiceMethods<T | Paginated<T>, D, P>
+{
+  async find(params?: P & { paginate?: PaginationOptions }): Promise<Paginated<T>>
+  async find(params?: P & { paginate: false }): Promise<T[]>
+  async find(params?: P): Promise<Paginated<T> | T[]>
+  async find(params?: P): Promise<Paginated<T> | T[]> {
+    return this._find(params) as any
+  }
+
+  async get(id: Id, params?: P): Promise<T> {
+    return this._get(id, params)
+  }
+
+  async create(data: D, params?: P): Promise<T>
+  async create(data: D[], params?: P): Promise<T[]>
+  async create(data: D | D[], params?: P): Promise<T | T[]> {
+    return this._create(data, params)
+  }
+
+  async update(id: Id, data: D, params?: P): Promise<T> {
+    return this._update(id, data, params)
+  }
+
+  async patch(id: Id, data: Partial<D>, params?: P): Promise<T>
+  async patch(id: null, data: Partial<D>, params?: P): Promise<T[]>
+  async patch(id: NullableId, data: Partial<D>, params?: P): Promise<T | T[]> {
+    return this._patch(id, data, params)
+  }
+
+  async remove(id: Id, params?: P): Promise<T>
+  async remove(id: null, params?: P): Promise<T[]>
+  async remove(id: NullableId, params?: P): Promise<T | T[]> {
+    return this._remove(id, params)
+  }
+}
+
+export function memory<T = any, D = Partial<T>, P extends Params = Params>(
+  options: Partial<MemoryServiceOptions<T>> = {}
+) {
+  return new MemoryService<T, D, P>(options)
 }
