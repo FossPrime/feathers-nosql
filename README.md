@@ -1,6 +1,20 @@
-# Feathers-NoSQL
+<p align="center">
+  <a href="https://vitejs.dev" target="_blank" rel="noopener noreferrer">
+    <img width="180" src="https://vitejs.dev/logo.svg" alt="Vite logo">
+  </a>
+</p>
+<br/>
+<p align="center">
+  <a href="https://npmjs.com/package/feathers-nosql"><img src="https://img.shields.io/npm/v/feathers-nosql.svg" alt="npm package"></a>
+  <a href="https://https://discord.gg/qa8kez8QBx"><img src="https://img.shields.io/badge/chat-discord-blue?style=flat&logo=discord" alt="discord chat"></a>
+</p>
+<br/>
+
+# Feathers-NoSQL 🫐
 
 A NoSQL database adapter for feathers, batteries included.
+
+**WIP: Do not use.**
 
 Goals:
 
